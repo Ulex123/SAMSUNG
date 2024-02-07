@@ -71,6 +71,9 @@ def create_line():
     count_lines = 1
     # 01 начальное изображение в серый
     im_color = cv2.imread(image)
+    # im_color = cv2.medianBlur(im_color, 3) # Фильтр медианный(Чем выше значение в скобках, тем сильнее влияние фильтра. Значение должно быть нечетным)
+    im_color = cv2.GaussianBlur(im_color,(5, 5),0) # Фильтр Гауса(Чем выше значение в скобках, тем сильнее влияние фильтра. Значение должно быть нечетным)
+    # im_color = cv2.bilateralFilter(im_color,9,75,75) # Фильтр двусторонний(Чем выше значение в скобках, тем сильнее влияние фильтра. Значение должно быть нечетным)
     im_grey = cv2.cvtColor(im_color, cv2.COLOR_BGR2GRAY)
     # cv2.imshow("im", im_gray)
     # cv2.waitKey(0)
@@ -377,7 +380,7 @@ def create_line():
     # 09 делим на отдельные линии и сохраняем
 
     for line in range(0, int(len(list_start_end_1)), 2):
-        croped = im_lines[list_start_end_1[line]:list_start_end_1[line + 1], x_not_grey_start1:x_not_grey_end1]
+        croped = im_color[list_start_end_1[line]:list_start_end_1[line + 1], x_not_grey_start1:x_not_grey_end1]
         if count_lines < 10:
             cv2.imwrite(folder_dir + "\\" + "line000" + str(count_lines) + ".tif", croped)
         elif count_lines < 100:
@@ -387,7 +390,7 @@ def create_line():
         count_lines = count_lines + 1
 
     for line in range(0, int(len(list_start_end_2)), 2):
-        croped = im_lines[list_start_end_2[line]:list_start_end_2[line + 1], x_not_grey_start2:x_not_grey_end2]
+        croped = im_color[list_start_end_2[line]:list_start_end_2[line + 1], x_not_grey_start2:x_not_grey_end2]
         if count_lines < 10:
             cv2.imwrite(folder_dir + "\\" + "line000" + str(count_lines) + ".tif", croped)
         elif count_lines < 100:
@@ -402,8 +405,8 @@ def create_line():
     for i in os.listdir(folder_dir):
         pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-        custom_config = r"--oem 3 --psm 13"
-        text = pytesseract.image_to_string(fr"{folder_dir}\{i}", lang='gubrus1', config=custom_config)
+        custom_config = r"--oem 3 --psm 10"
+        text = pytesseract.image_to_string(fr"{folder_dir}\{i}", lang='newgubrus', config=custom_config)
         with open('output.txt', 'a') as file:
             file.write(text.strip() + '\n')
     with open('output.txt', 'r') as file:
